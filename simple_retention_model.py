@@ -57,25 +57,27 @@ ax.set_xlabel('Number of periods')
 tab1.pyplot(fig)
 
 tab2.text('''
-This tool generates the retention curve corresponding to a Weibull survival model,
+This tool generates the retention curve corresponding to a mixed Weibull survival model,
 where the probability of a customer being retained after k or more periods is given by the
 expression:
 ''')
 tab2.latex(r'''
-\exp\left(-\left(\frac{k}{\lambda} \right)^\rho\right)
+\gamma(k) = \exp\left(-\left(\frac{k}{\lambda} \right)^\rho\right) (1-p) + p
 ''')
 tab2.text('''
-with parameters \lambda and \\rho roughly corresponding to the average lifetime 
-(time to churn) of a customer and to the rate at which the rate of churn increases
- or decreases as time goes by, respectively.
+with parameters p, \lambda and \\rho roughly corresponding to:
+- the share of customers who are forever retained
+- the average lifetime (time to churn) of a customer 
+- the rate at which the rate of churn increasesor decreases as time goes by, 
+respectively.
  
-Given that retention curve, and assuming the number of new customers
-per period remains constant, the tool displays the number of customers,
+Given that retention curve, and assuming the number of new customers (N)
+per period remains constant, the tool displays the number of customers (C(t)),
 the customer growth and the churn rate
 as a function of the number of periods since the start:
 ''')
 tab2.latex(r'''
-\exp\left(-\left(\frac{k}{\lambda} \right)^\rho\right)
+C(t) = (1 + \sum_{k=1}^t \gamma(k))N
 ''')
 
 tab1.subheader(f"Expected status after {n_periods} periods:")
