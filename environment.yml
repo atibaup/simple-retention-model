@@ -7,8 +7,9 @@ dependencies:
   - matplotlib-base
   - numpy
   - pandas
-  - pip
-  - python
+  - pip=22.3
+  - python=3.9
   - python-dateutil
   - pip:
+    - streamlit==1.13.0gi
     - streamlit-aggrid
