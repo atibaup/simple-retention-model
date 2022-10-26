@@ -3,7 +3,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 import pandas as pd
 from lifelines import WeibullFitter, ExponentialFitter
-from st_aggrid import AgGrid, GridOptionsBuilder
 from weibull_mixture_fitter import WeibullInfiniteMixtureFitter
 
 plt.style.use('dark_background')
@@ -152,13 +151,6 @@ tab1.pyplot(fig)
 
 with tab2:
     if df is not None:
-        df_aggrid = df.reset_index().rename(columns=lambda x: str(x))
-        builder = GridOptionsBuilder.from_dataframe(df_aggrid)
-        builder.configure_auto_height(autoHeight=False)
-        builder.configure_default_column(width=50, editable=False)
-        builder.configure_column('cohort', width=100)
-        go = builder.build()
-        #grid_return = AgGrid(df_aggrid, gridOptions=go)
         st.markdown(df.to_markdown())
     else:
         st.markdown('''
