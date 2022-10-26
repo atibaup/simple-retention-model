@@ -1,0 +1,7 @@
+lifelines
+matplotlib-base
+numpy
+pandas
+python-dateutil
+tabulate
+streamlit
