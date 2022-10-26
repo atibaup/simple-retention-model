@@ -158,7 +158,8 @@ with tab2:
         builder.configure_default_column(width=50, editable=False)
         builder.configure_column('cohort', width=100)
         go = builder.build()
-        grid_return = AgGrid(df_aggrid, gridOptions=go)
+        #grid_return = AgGrid(df_aggrid, gridOptions=go)
+        st.markdown(df.to_markdown())
     else:
         st.markdown('''
         Use the menu on the left to upload a file with your retention data.
