@@ -1,5 +1,5 @@
 lifelines
-matplotlib-base
+matplotlib
 numpy
 pandas
 python-dateutil
