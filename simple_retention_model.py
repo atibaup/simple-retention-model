@@ -9,6 +9,10 @@ from docs import explanation
 plt.style.use('dark_background')
 
 
+def harmonic_survival(timelines):
+    return 1/(timelines + 1)
+
+
 def weibull_survival(timelines, lambda_, rho_):
     return np.exp(-np.power(timelines/lambda_, rho_))
 
@@ -17,7 +21,7 @@ def mixed_weibull_and_retained(timelines, lambda_, rho_, gamma):
     return gamma + (1-gamma)*weibull_survival(timelines, lambda_, rho_)
 
 
-def expected_customers(n_periods, N_0, lambda_, rho_, gamma):
+def expected_customers_weibull_mixture(n_periods, N_0, lambda_, rho_, gamma):
     retained = np.zeros(n_periods)
     periods = np.array([i for i in range(n_periods)])
     retention = mixed_weibull_and_retained(periods, lambda_, rho_, gamma)
@@ -26,9 +30,24 @@ def expected_customers(n_periods, N_0, lambda_, rho_, gamma):
     return retained
 
 
-def expected_customer_growth(n_periods, N_0, lambda_, rho_, gamma):
+def expected_customer_growth_weibull_mixture(n_periods, N_0, lambda_, rho_, gamma):
     periods = np.array([i for i in range(n_periods)])
     retention = mixed_weibull_and_retained(periods, lambda_, rho_, gamma)
+    return N_0 * retention
+
+
+def expected_customers_harmonic(n_periods, N_0):
+    retained = np.zeros(n_periods)
+    periods = np.array([i for i in range(n_periods)])
+    retention = harmonic_survival(periods)
+    for n in range(1, n_periods):
+        retained[n] = N_0 * sum(retention[:n])
+    return retained
+
+
+def expected_customer_growth_harmonic(n_periods, N_0):
+    periods = np.array([i for i in range(n_periods)])
+    retention = harmonic_survival(periods)
     return N_0 * retention
 
 
@@ -80,7 +99,7 @@ with st.sidebar:
 
     survival_model = st.selectbox(
         'Survival model',
-        ('Exponential', 'Weibull', 'Mixture of Weibull and infinite (*)'),
+        ('Exponential', 'Weibull', 'Mixture of Weibull and infinite (*)', 'Harmonic'),
         index=1)
 
     if uploaded_file is not None:
@@ -102,6 +121,11 @@ with st.sidebar:
             lambda_default = float(round(fitted_model.lambda_, 2))
             rho_default = float(round(fitted_model.rho_, 2))
             pct_highly_retained_default = 100*float(round(fitted_model.p_, 2))
+        elif survival_model == 'Harmonic':
+            fitted_model = None
+            lambda_default = 0
+            rho_default = 1.0
+            pct_highly_retained_default = 0.
         else:
             fitted_model = ExponentialFitter().fit(durations, observed)
             lambda_default = float(round(fitted_model.lambda_, 2))
@@ -128,7 +152,10 @@ with st.sidebar:
 
 timeline = np.array([i for i in range(n_periods)])
 
-retention_profile = mixed_weibull_and_retained(timeline, lambda_, rho_, pct_highly_retained/100)
+if survival_model == 'Harmonic':
+    retention_profile = harmonic_survival(timeline)
+else:
+    retention_profile = mixed_weibull_and_retained(timeline, lambda_, rho_, pct_highly_retained/100)
 
 st.header("Simplified retention model")
 
@@ -165,9 +192,14 @@ tab3.markdown(explanation)
 
 tab1.markdown(f"Expected state after {n_periods} periods:")
 
-customers = expected_customers(n_periods, avg_new_customers, lambda_, rho_, pct_highly_retained/100)
-growth = expected_customer_growth(n_periods, avg_new_customers, lambda_, rho_, pct_highly_retained/100)
-churned = avg_new_customers - expected_customer_growth(n_periods, avg_new_customers, lambda_, rho_, pct_highly_retained/100)
+if survival_model == 'Harmonic':
+    customers = expected_customers_harmonic(n_periods, avg_new_customers)
+    growth = expected_customer_growth_harmonic(n_periods, avg_new_customers)
+else:
+    customers = expected_customers_weibull_mixture(n_periods, avg_new_customers, lambda_, rho_, pct_highly_retained / 100)
+    growth = expected_customer_growth_weibull_mixture(n_periods, avg_new_customers, lambda_, rho_, pct_highly_retained / 100)
+
+churned = avg_new_customers - growth
 churn_rate = 100*churned/customers
 
 col1, col2, col3 = tab1.columns(3)
@@ -182,6 +214,7 @@ ax.plot(timeline, customers)
 ax.set_ylabel('Number of customers')
 ax.set_xlabel('Number of periods')
 tab11.pyplot(fig)
+print(customers)
 
 fig, ax = plt.subplots(figsize=(7, 3))
 ax.plot(timeline, growth)
