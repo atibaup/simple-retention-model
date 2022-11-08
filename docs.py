@@ -26,5 +26,5 @@ C(t) = \sum_{k=0}^t s(k) N
 $$
 
 the customer growth $\Delta C(t)$ and the churn rate
-as a function of the number of periods since the start.
+as a function of the number of periods since the start. See [this blog post](https://arnautibau.notion.site/The-two-things-that-matter-for-growth-1d4f3ae52131426eb1652d8b8538144d) for more details.
 '''

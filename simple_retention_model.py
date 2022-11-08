@@ -89,7 +89,7 @@ def calculate_aggregate_retention(retention_df):
 with st.sidebar:
     st.header('Model parameters')
     st.markdown('''
-    You can upload your retention data as a CSV or play with
+     You can upload your retention data as a CSV (in beta) or play with
      the parameters below to generate different scenarios:
      ''')
 
